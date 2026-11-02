@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Patidar Properties — Karadiya, Ratlam</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600;9..144,700&family=Hind:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- Firebase (Google Database) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<style>
+  :root{
+    --green-deep:#123832;
+    --green-mid:#1B5148;
+    --cream:#F7F1E4;
+    --cream-soft:#FFFDF8;
+    --gold:#D9A441;
+    --terracotta:#C1502E;
+    --ink:#1E1B16;
+    --ink-soft:#4A453C;
+    --line: rgba(30,27,22,0.12);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'Hind', sans-serif;
+    background:var(--cream);
+    color:var(--ink);
+    line-height:1.6;
+  }
+  h1,h2,h3,.brand{
+    font-family:'Fraunces', serif;
+  }
+  a{color:inherit; text-decoration:none;}
+  img,svg{display:block; max-width:100%;}
+  .wrap{max-width:1120px; margin:0 auto; padding:0 24px;}
+
+  /* Header */
+  header{
+    position:sticky; top:0; z-index:50;
+    background:var(--green-deep);
+    color:var(--cream-soft);
+    border-bottom:1px solid rgba(247,241,228,0.12);
+  }
+  header .wrap{
+    display:flex; align-items:center; justify-content:space-between;
+    padding-top:16px; padding-bottom:16px;
+  }
+  .brand{font-size:22px; font-weight:600; letter-spacing:0.3px;}
+  .brand span{color:var(--gold);}
+  nav{display:flex; gap:28px; font-size:16px;}
+  nav a{opacity:0.88; transition:opacity 0.2s;}
+  nav a:hover{opacity:1;}
+  .header-call{
+    display:flex; align-items:center; gap:8px;
+    background:var(--gold); color:var(--green-deep);
+    padding:8px 16px; border-radius:4px;
+    font-weight:600; font-size:15px;
+    white-space:nowrap;
+  }
+  .nav-toggle{display:none; background:none; border:none; color:var(--cream-soft); font-size:26px; cursor:pointer;}
+
+  /* Hero */
+  .hero{
+    background:var(--green-deep);
+    color:var(--cream-soft);
+    position:relative;
+    overflow:hidden;
+  }
+  .hero .wrap{
+    display:grid; grid-template-columns:1.1fr 0.9fr; gap:40px;
+    align-items:center;
+    padding-top:72px; padding-bottom:88px;
+  }
+  .hero-eyebrow{
+    color:var(--gold); font-size:16px; font-weight:600; margin-bottom:18px;
+  }
+  .hero h1{
+    font-size:52px; font-weight:600; line-height:1.15; margin-bottom:22px;
+  }
+  .hero h1 em{font-style:normal; color:var(--gold);}
+  .hero p{
+    font-size:18px; color:rgba(247,241,228,0.82); max-width:46ch; margin-bottom:32px;
+  }
+  .btn-row{display:flex; gap:16px; flex-wrap:wrap;}
+  .btn{
+    display:inline-flex; align-items:center; gap:10px;
+    padding:14px 26px; border-radius:4px; font-weight:600; font-size:16px;
+    border:1.5px solid transparent; cursor:pointer;
+  }
+  .btn-primary{background:var(--gold); color:var(--green-deep);}
+  .btn-outline{border-color:rgba(247,241,228,0.5); color:var(--cream-soft);}
+  .btn-outline:hover{border-color:var(--cream-soft);}
+
+  .hero-art{position:relative;}
+  .hero-art svg{width:100%; height:auto;}
+
+  /* Section headings */
+  .section{padding:80px 0;}
+  .section-head{max-width:640px; margin-bottom:48px;}
+  .eyebrow{color:var(--terracotta); font-weight:600; font-size:15px; margin-bottom:10px;}
+  .section-head h2{font-size:36px; font-weight:600; color:var(--green-deep);}
+  .section-head p{color:var(--ink-soft); font-size:17px; margin-top:12px;}
+
+  /* Properties */
+  .property{
+    display:grid; grid-template-columns:1fr 1fr; gap:48px;
+    align-items:start;
+    padding:44px 0;
+    border-top:1px solid var(--line);
+  }
+  .property:last-child{border-bottom:1px solid var(--line);}
+  .property.reverse{direction:rtl;}
+  .property.reverse > *{direction:ltr;}
+  .prop-art{
+    background:var(--green-mid);
+    border-radius:6px;
+    aspect-ratio:4/3;
+    display:flex; align-items:center; justify-content:center;
+    position:relative;
+    overflow:hidden;
+  }
+  .prop-art svg{width:62%; height:auto;}
+  .prop-tag{
+    position:absolute; top:16px; left:16px;
+    background:var(--gold); color:var(--green-deep);
+    font-weight:700; font-size:13px;
+    padding:6px 12px; border-radius:3px;
+  }
+  .prop-info h3{font-size:26px; color:var(--green-deep); margin-bottom:8px;}
+  .prop-loc{color:var(--terracotta); font-weight:600; font-size:15px; margin-bottom:18px;}
+  .prop-facts{
+    display:flex; gap:20px; margin-bottom:20px; flex-wrap:wrap;
+  }
+  .prop-fact{
+    background:var(--cream-soft); border:1px solid var(--line);
+    padding:10px 16px; border-radius:4px; font-size:15px; text-align:center;
+    min-width:88px;
+  }
+  .prop-fact b{display:block; font-size:18px; color:var(--green-deep); font-family:'Fraunces',serif;}
+  .amenities{
+    display:flex; flex-wrap:wrap; gap:10px; margin-bottom:24px;
+  }
+  .amenity{
+    font-size:14px; color:var(--ink-soft);
+    background:rgba(18,56,50,0.06); padding:7px 14px; border-radius:20px;
+  }
+  .prop-cta{display:flex; gap:14px; flex-wrap:wrap;}
+
+  .property{grid-template-columns:0.85fr 1.15fr;}
+  .prop-summary{display:flex; gap:16px; margin-bottom:22px; flex-wrap:wrap;}
+  .prop-summary .prop-fact{min-width:110px;}
+
+  .unit-grid{
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(150px,1fr));
+    gap:14px;
+  }
+  .unit-card{
+    background:var(--cream-soft); border:1px solid var(--line); border-radius:6px;
+    padding:16px; text-align:left;
+  }
+  .unit-card .unit-icon{
+    width:36px; height:36px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:17px; margin-bottom:10px;
+  }
+  .unit-card.room .unit-icon{background:rgba(27,81,72,0.12);}
+  .unit-card.shop .unit-icon{background:rgba(193,80,46,0.14);}
+  .unit-card b{display:block; font-size:15.5px; color:var(--green-deep); margin-bottom:2px;}
+  .unit-card .unit-rent{font-size:13.5px; color:var(--ink-soft); margin-bottom:12px;}
+  .unit-card a{
+    display:inline-block; font-size:13.5px; font-weight:600;
+    color:var(--terracotta); border-bottom:1.5px solid var(--terracotta);
+    padding-bottom:1px;
+  }
+  .btn-small{
+    padding:11px 20px; border-radius:4px; font-weight:600; font-size:15px;
+  }
+  .btn-green{background:var(--green-deep); color:var(--cream-soft);}
+  .btn-ghost{border:1.5px solid var(--green-deep); color:var(--green-deep);}
+
+  .unit-badge{
+    display:inline-block; font-size:12px; font-weight:700;
+    padding:3px 10px; border-radius:20px; margin-bottom:10px;
+  }
+  .unit-badge.available{background:rgba(27,81,72,0.14); color:var(--green-mid);}
+  .unit-badge.occupied{background:rgba(193,80,46,0.14); color:var(--terracotta);}
+  .unit-badge.coming-soon{background:rgba(217,164,65,0.18); color:#9c6d0e;}
+  .unit-neighbor{font-size:13.5px; color:var(--ink-soft); margin-bottom:4px;}
+
+  /* Owner section */
+  .owner-section{background:#0D2621; color:var(--cream-soft);}
+  .owner-section .eyebrow{color:var(--gold);}
+  .owner-section .section-head h2{color:var(--cream-soft);}
+  .owner-section .section-head p{color:rgba(247,241,228,0.75);}
+  .login-box{
+    max-width:360px; display:flex; flex-direction:column; gap:14px;
+    background:rgba(247,241,228,0.06); border:1px solid rgba(247,241,228,0.18);
+    padding:26px; border-radius:6px;
+  }
+  .login-box input{
+    padding:13px 14px; border-radius:4px; border:1.5px solid rgba(247,241,228,0.25);
+    background:rgba(247,241,228,0.08); color:var(--cream-soft); font-size:15.5px;
+  }
+  .login-box input::placeholder{color:rgba(247,241,228,0.5);}
+  .login-error{color:#E8A87C; font-size:14px; display:none;}
+  .admin-panel{display:none;}
+  .admin-table{width:100%; border-collapse:collapse; margin-bottom:16px;}
+  .admin-table th{
+    text-align:left; font-size:13px; color:var(--gold); font-weight:600;
+    padding:8px 10px; border-bottom:1px solid rgba(247,241,228,0.2);
+  }
+  .admin-table td{
+    padding:8px 10px; border-bottom:1px solid rgba(247,241,228,0.1); vertical-align:middle;
+  }
+  .admin-table input, .admin-table select{
+    width:100%; padding:8px 9px; border-radius:4px; border:1px solid rgba(247,241,228,0.25);
+    background:rgba(247,241,228,0.08); color:var(--cream-soft); font-size:14px;
+  }
+  .admin-group h4{color:var(--gold); font-size:16px; margin:22px 0 10px; font-family:'Fraunces',serif;}
+  .save-note{font-size:13.5px; color:rgba(247,241,228,0.6); margin-top:6px; display:none;}
+  .logout-link{font-size:14px; color:var(--gold); margin-top:18px; display:inline-block; cursor:pointer;}
+
+  /* Location */
+  .location{background:var(--green-deep); color:var(--cream-soft);}
+  .location .section-head p{color:rgba(247,241,228,0.78);}
+  .location .eyebrow{color:var(--gold);}
+  .location .section-head h2{color:var(--cream-soft);}
+  .loc-grid{display:grid; grid-template-columns:1fr 1.1fr; gap:40px; align-items:center;}
+  .loc-details{font-size:16px;}
+  .loc-details p{margin-bottom:14px; color:rgba(247,241,228,0.85);}
+  .loc-details b{color:var(--gold);}
+  .map-frame{
+    border-radius:6px; overflow:hidden; border:1px solid rgba(247,241,228,0.2);
+    aspect-ratio:4/3;
+  }
+  .map-frame iframe{width:100%; height:100%; border:0;}
+
+  /* Contact */
+  .contact-grid{display:grid; grid-template-columns:0.9fr 1.1fr; gap:56px;}
+  .contact-cards{display:flex; flex-direction:column; gap:16px;}
+  .contact-card{
+    background:var(--cream-soft); border:1px solid var(--line); border-radius:6px;
+    padding:22px; display:flex; align-items:center; gap:16px;
+  }
+  .contact-icon{
+    width:44px; height:44px; border-radius:50%; background:var(--gold);
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .contact-card b{display:block; color:var(--green-deep); font-size:16px;}
+  .contact-card span{color:var(--ink-soft); font-size:14.5px;}
+
+  form{display:flex; flex-direction:column; gap:16px;}
+  .field{display:flex; flex-direction:column; gap:6px;}
+  .field label{font-size:14.5px; font-weight:600; color:var(--green-deep);}
+  .field input, .field textarea{
+    padding:13px 14px; border-radius:4px; border:1.5px solid var(--line);
+    font-family:'Hind',sans-serif; font-size:15.5px; background:var(--cream-soft);
+  }
+  .field input:focus, .field textarea:focus{outline:2px solid var(--gold); border-color:var(--gold);}
+  .field textarea{resize:vertical; min-height:90px;}
+  .form-note{font-size:13.5px; color:var(--ink-soft);}
+
+  footer{
+    background:#0D2621; color:rgba(247,241,228,0.7);
+    padding:36px 0; font-size:14.5px;
+  }
+  footer .wrap{display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px;}
+  footer .brand{color:var(--cream-soft); font-size:18px; margin-bottom:4px;}
+
+  @media(max-width:860px){
+    nav{display:none;}
+    .nav-toggle{display:block;}
+    .hero .wrap{grid-template-columns:1fr; padding-top:48px; padding-bottom:56px;}
+    .hero h1{font-size:36px;}
+    .hero-art{order:-1; max-width:280px; margin:0 auto;}
+    .property, .property.reverse{grid-template-columns:1fr; direction:ltr;}
+    .loc-grid, .contact-grid{grid-template-columns:1fr;}
+    .section{padding:56px 0;}
+    .header-call span.call-text{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="brand">Patidar <span>Properties</span></div>
+    <nav>
+      <a href="#properties">प्रॉपर्टी</a>
+      <a href="#location">लोकेशन</a>
+      <a href="#contact">संपर्क करें</a>
+      <a href="#owner">Owner Login</a>
+    </nav>
+    <a class="header-call" href="tel:9755345287">
+      📞 <span class="call-text">9755345287</span>
+    </a>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <div>
+      <div class="hero-eyebrow">करड़िया, रतलाम (म.प्र.)</div>
+      <h1>किराए के लिए <em>भरोसेमंद घर</em>, आपके अपने शहर में</h1>
+      <p>Patidar Properties करड़िया क्षेत्र में साफ़-सुथरे, अच्छी लोकेशन वाले मकान किराए पर उपलब्ध कराता है। सीधे मालिक से बात करें, बिना किसी बिचौलिए के।</p>
+      <div class="btn-row">
+        <a href="#properties" class="btn btn-primary">प्रॉपर्टी देखें</a>
+        <a href="https://wa.me/919755345287" class="btn btn-outline">WhatsApp पर पूछें</a>
+      </div>
+    </div>
+    <div class="hero-art">
+      <svg viewBox="0 0 360 320" fill="none">
+        <polygon points="60,170 180,70 300,170" fill="#D9A441"/>
+        <rect x="80" y="170" width="200" height="130" fill="#FFFDF8"/>
+        <rect x="105" y="200" width="55" height="55" fill="#1B5148"/>
+        <rect x="200" y="200" width="55" height="55" fill="#C1502E"/>
+        <rect x="150" y="255" width="60" height="45" fill="#123832"/>
+        <rect x="60" y="300" width="240" height="10" fill="#D9A441"/>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="properties">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">उपलब्ध Rooms & Shops</div>
+      <h2>2 प्रॉपर्टी, हर एक में अलग-अलग Room और Shop</h2>
+      <p>हर प्रॉपर्टी में rooms और shops अलग-अलग किराए पर उपलब्ध हैं। किसी भी unit की जानकारी या देखने के लिए सीधे कॉल या WhatsApp करें।</p>
+      <p style="margin-top:14px; font-weight:600; color:var(--terracotta);">नियम: एक व्यक्ति / परिवार को केवल 1 Room या 1 Shop ही किराए पर दी जाएगी।</p>
+    </div>
+
+    <div class="property">
+      <div class="prop-art">
+        <span class="prop-tag">प्रॉपर्टी 1</span>
+        <svg viewBox="0 0 200 160" fill="none">
+          <polygon points="20,90 100,30 180,90" fill="#D9A441"/>
+          <rect x="35" y="90" width="130" height="60" fill="#FFFDF8" opacity="0.95"/>
+          <rect x="55" y="105" width="30" height="30" fill="#1B5148"/>
+          <rect x="115" y="105" width="30" height="30" fill="#C1502E"/>
+        </svg>
+      </div>
+      <div class="prop-info">
+        <h3>करड़िया हाउस — मेन रोड के पास</h3>
+        <div class="prop-loc">करड़िया, रतलाम, मध्य प्रदेश</div>
+        <div class="prop-summary">
+          <div class="prop-fact"><b>2</b>Rooms</div>
+          <div class="prop-fact"><b>2</b>Shops</div>
+        </div>
+        <div class="unit-grid" id="units-p1"></div>
+        <div class="prop-cta" style="margin-top:20px;">
+          <a href="tel:9755345287" class="btn btn-small btn-green">📞 कॉल करें</a>
+          <a href="https://wa.me/919755345287?text=Namaste%2C%20mujhe%20Property%201%20ke%20baare%20mein%20poori%20jaankari%20chahiye" class="btn btn-small btn-ghost">WhatsApp करें</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="property reverse">
+      <div class="prop-art">
+        <span class="prop-tag">प्रॉपर्टी 2</span>
+        <svg viewBox="0 0 200 160" fill="none">
+          <polygon points="20,90 100,30 180,90" fill="#C1502E"/>
+          <rect x="35" y="90" width="130" height="60" fill="#FFFDF8" opacity="0.95"/>
+          <rect x="55" y="105" width="30" height="30" fill="#123832"/>
+          <rect x="115" y="105" width="30" height="30" fill="#D9A441"/>
+        </svg>
+      </div>
+      <div class="prop-info">
+        <h3>करड़िया हाउस — दूसरा मकान</h3>
+        <div class="prop-loc">करड़िया, रतलाम, मध्य प्रदेश</div>
+        <div class="prop-summary">
+          <div class="prop-fact"><b>4</b>Rooms</div>
+          <div class="prop-fact"><b>2</b>Shops</div>
+        </div>
+        <div class="unit-grid" id="units-p2"></div>
+        <div class="prop-cta" style="margin-top:20px;">
+          <a href="tel:9752010884" class="btn btn-small btn-green">📞 कॉल करें</a>
+          <a href="https://wa.me/919752010884?text=Namaste%2C%20mujhe%20Property%202%20ke%20baare%20mein%20poori%20jaankari%20chahiye" class="btn btn-small btn-ghost">WhatsApp करें</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section location" id="location">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">कहाँ है</div>
+      <h2>लोकेशन</h2>
+    </div>
+    <div class="loc-grid">
+      <div class="loc-details">
+        <p><b>पता:</b><br>करड़िया, रतलाम, मध्य प्रदेश</p>
+        <p><b>संपर्क नंबर:</b><br>9755345287<br>9752010884</p>
+        <p>दोनों नंबर पर कॉल और WhatsApp दोनों से बात की जा सकती है।</p>
+      </div>
+      <div class="map-frame">
+        <iframe src="https://maps.google.com/maps?q=Karadiya%2C%20Ratlam%2C%20Madhya%20Pradesh&t=&z=13&ie=UTF8&iwloc=&output=embed" allowfullscreen="" loading="lazy"></iframe>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="contact">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">संपर्क करें</div>
+      <h2>पूछताछ के लिए फॉर्म भरें</h2>
+      <p>फॉर्म भरते ही आपका मैसेज तैयार होकर WhatsApp पर खुल जाएगा — बस भेज दीजिए।</p>
+    </div>
+    <div class="contact-grid">
+      <div class="contact-cards">
+        <div class="contact-card">
+          <div class="contact-icon">📞</div>
+          <div><b>9755345287</b><span>कॉल / WhatsApp</span></div>
+        </div>
+        <div class="contact-card">
+          <div class="contact-icon">📞</div>
+          <div><b>9752010884</b><span>कॉल / WhatsApp</span></div>
+        </div>
+        <div class="contact-card">
+          <div class="contact-icon">📍</div>
+          <div><b>करड़िया, रतलाम</b><span>मध्य प्रदेश</span></div>
+        </div>
+      </div>
+      <form id="inquiryForm">
+        <div class="field">
+          <label for="name">आपका नाम</label>
+          <input type="text" id="name" required placeholder="जैसे: राहुल पाटीदार">
+        </div>
+        <div class="field">
+          <label for="phone">मोबाइल नंबर</label>
+          <input type="tel" id="phone" required placeholder="10 अंकों का मोबाइल नंबर">
+        </div>
+        <div class="field">
+          <label for="prop">किस प्रॉपर्टी में रुचि है?</label>
+          <input type="text" id="prop" placeholder="प्रॉपर्टी 1 / प्रॉपर्टी 2 / दोनों">
+        </div>
+        <div class="field">
+          <label for="msg">संदेश</label>
+          <textarea id="msg" placeholder="कब देखना चाहेंगे, कोई सवाल आदि"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="align-self:flex-start;">WhatsApp पर भेजें</button>
+        <div class="form-note">भेजने पर WhatsApp खुलेगा और मैसेज पहले से भरा होगा।</div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<section class="section owner-section" id="owner">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">सिर्फ मालिक के लिए</div>
+      <h2>Owner Login</h2>
+      <p>यहाँ लॉगिन करके किराया, tenant का नाम और मोबाइल नंबर देखा और अपडेट किया जा सकता है। बाकी visitors को यह जानकारी नहीं दिखती।</p>
+    </div>
+
+    <div id="firebaseWarning" style="display:none; background:rgba(217,164,65,0.15); border:1px solid rgba(217,164,65,0.4); color:var(--gold); padding:14px 18px; border-radius:6px; font-size:14.5px; margin-bottom:24px; max-width:560px;">
+      ⚠️ Firebase अभी तक जोड़ा नहीं गया है — नीचे दिए स्टेप्स से config डालें, तभी data असली में save होगा।
+    </div>
+
+    <div id="loginBox" class="login-box">
+      <input type="password" id="ownerPassword" placeholder="Password डालें">
+      <div class="login-error" id="loginError">गलत password, दोबारा कोशिश करें।</div>
+      <button class="btn btn-primary" id="loginBtn" style="align-self:flex-start;">लॉगिन करें</button>
+    </div>
+
+    <div id="adminPanel" class="admin-panel">
+      <div class="admin-group">
+        <h4>प्रॉपर्टी 1</h4>
+        <table class="admin-table" id="admin-p1">
+          <thead><tr><th>Unit</th><th>Status</th><th>Tenant नाम</th><th>Mobile</th><th>किराया (₹)</th><th>Payment</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="admin-group">
+        <h4>प्रॉपर्टी 2</h4>
+        <table class="admin-table" id="admin-p2">
+          <thead><tr><th>Unit</th><th>Status</th><th>Tenant नाम</th><th>Mobile</th><th>किराया (₹)</th><th>Payment</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <button class="btn btn-primary" id="saveBtn">Save करें</button>
+      <div class="save-note" id="saveNote">✓ Save हो गया</div>
+      <div class="logout-link" id="logoutBtn">लॉगआउट</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <div class="brand">Patidar Properties</div>
+      <div>करड़िया, रतलाम, मध्य प्रदेश</div>
+    </div>
+    <div>📞 9755345287 · 9752010884</div>
+  </div>
+</footer>
+
+<script>
+  // ====== FIREBASE CONFIG — यहाँ अपना config डालें (नीचे दिए गए स्टेप्स देखें) ======
+  var firebaseConfig = {
+    apiKey: "AIzaSyDuirSOmpd4W2nw4G1Pqa94rT_Ttln4m2E",
+    authDomain: "patidar-properties.firebaseapp.com",
+    projectId: "patidar-properties",
+    storageBucket: "patidar-properties.firebasestorage.app",
+    messagingSenderId: "604778299172",
+    appId: "1:604778299172:web:2feced8a5dbc32a0193db1"
+  };
+  var firebaseReady = firebaseConfig.apiKey !== "YOUR_API_KEY";
+  var db = null;
+  if(firebaseReady){
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.firestore();
+  }
+
+  var UNITS = [
+    {id:'p1-r1', prop:1, type:'room', label:'Room 1', phone:'919755345287'},
+    {id:'p1-r2', prop:1, type:'room', label:'Room 2', phone:'919755345287'},
+    {id:'p1-s1', prop:1, type:'shop', label:'Shop 1', phone:'919755345287'},
+    {id:'p1-s2', prop:1, type:'shop', label:'Shop 2', phone:'919755345287'},
+    {id:'p2-r1', prop:2, type:'room', label:'Room 1', phone:'919752010884'},
+    {id:'p2-r2', prop:2, type:'room', label:'Room 2', phone:'919752010884'},
+    {id:'p2-r3', prop:2, type:'room', label:'Room 3', phone:'919752010884'},
+    {id:'p2-r4', prop:2, type:'room', label:'Room 4', phone:'919752010884'},
+    {id:'p2-s1', prop:2, type:'shop', label:'Shop 1', phone:'919752010884'},
+    {id:'p2-s2', prop:2, type:'shop', label:'Shop 2', phone:'919752010884'}
+  ];
+  var OWNER_PASSWORD = 'P@tel9785';
+
+  function defaultData(){
+    var d = {};
+    UNITS.forEach(function(u){
+      d[u.id] = {status:'available', tenantName:'', tenantMobile:'', rent:'', paymentStatus:'due'};
+    });
+    d['p2-r1'].status = 'coming_soon';
+    d['p2-r2'].status = 'coming_soon';
+    d['p2-r3'].status = 'coming_soon';
+    d['p2-r4'].status = 'coming_soon';
+    d['p2-s1'].status = 'coming_soon';
+    return d;
+  }
+
+  async function loadUnitData(){
+    if(!firebaseReady){ return defaultData(); }
+    try{
+      var doc = await db.collection('patidar-properties').doc('unit-status').get();
+      if(doc.exists){ return doc.data(); }
+      return defaultData();
+    }catch(e){
+      console.error('Firebase load error', e);
+      return defaultData();
+    }
+  }
+
+  async function saveUnitData(data){
+    if(!firebaseReady){ return false; }
+    try{
+      await db.collection('patidar-properties').doc('unit-status').set(data);
+      return true;
+    }catch(e){
+      console.error('Firebase save error', e);
+      return false;
+    }
+  }
+
+  function renderPublicUnits(data){
+    var groups = {1:[], 2:[]};
+    UNITS.forEach(function(u){ groups[u.prop].push(u); });
+
+    [1,2].forEach(function(propNum){
+      var el = document.getElementById('units-p' + propNum);
+      if(!el) return;
+      el.innerHTML = groups[propNum].map(function(u){
+        var d = data[u.id] || {status:'available'};
+        var icon = u.type === 'room' ? '🛏️' : '🏬';
+        var waText = 'Namaste, mujhe Property ' + propNum + ' ke ' + u.label + ' ke baare mein jaankari chahiye';
+
+        if(d.status === 'occupied'){
+          return '<div class="unit-card ' + u.type + '">' +
+            '<div class="unit-icon">' + icon + '</div>' +
+            '<span class="unit-badge occupied">भरा हुआ</span>' +
+            '<b>' + u.label + '</b>' +
+            '<div class="unit-neighbor">रह रहे हैं: ' + escapeHtml(d.tenantName || 'बताया नहीं') + '</div>' +
+            '</div>';
+        }
+        if(d.status === 'coming_soon'){
+          return '<div class="unit-card ' + u.type + '">' +
+            '<div class="unit-icon">' + icon + '</div>' +
+            '<span class="unit-badge coming-soon">Coming Soon</span>' +
+            '<b>' + u.label + '</b>' +
+            '<div class="unit-rent">जल्द उपलब्ध होगा</div>' +
+            '</div>';
+        }
+        return '<div class="unit-card ' + u.type + '">' +
+          '<div class="unit-icon">' + icon + '</div>' +
+          '<span class="unit-badge available">खाली</span>' +
+          '<b>' + u.label + '</b>' +
+          '<div class="unit-rent">किराया — संपर्क करें</div>' +
+          '<a href="https://wa.me/' + u.phone + '?text=' + encodeURIComponent(waText) + '">पूछें →</a>' +
+          '</div>';
+      }).join('');
+    });
+  }
+
+  function escapeHtml(str){
+    var d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+  }
+
+  function renderAdmin(data){
+    [1,2].forEach(function(propNum){
+      var tbody = document.querySelector('#admin-p' + propNum + ' tbody');
+      if(!tbody) return;
+      tbody.innerHTML = UNITS.filter(function(u){ return u.prop === propNum; }).map(function(u){
+        var d = data[u.id] || {};
+        var st = d.status || 'available';
+        return '<tr data-unit="' + u.id + '">' +
+          '<td>' + u.label + '</td>' +
+          '<td><select class="f-status-main">' +
+            '<option value="available"' + (st==='available'?' selected':'') + '>खाली</option>' +
+            '<option value="occupied"' + (st==='occupied'?' selected':'') + '>भरा हुआ</option>' +
+            '<option value="coming_soon"' + (st==='coming_soon'?' selected':'') + '>Coming Soon</option>' +
+          '</select></td>' +
+          '<td><input class="f-name" value="' + escapeAttr(d.tenantName||'') + '" placeholder="Tenant नाम"></td>' +
+          '<td><input class="f-mobile" value="' + escapeAttr(d.tenantMobile||'') + '" placeholder="Mobile"></td>' +
+          '<td><input class="f-rent" value="' + escapeAttr(d.rent||'') + '" placeholder="Amount"></td>' +
+          '<td><select class="f-status"><option value="paid"' + (d.paymentStatus==='paid'?' selected':'') + '>Paid</option><option value="due"' + (d.paymentStatus!=='paid'?' selected':'') + '>Due</option></select></td>' +
+          '</tr>';
+      }).join('');
+    });
+  }
+
+  function escapeAttr(str){
+    return String(str).replace(/"/g,'&quot;');
+  }
+
+  var currentData = null;
+
+  if(!firebaseReady){
+    document.getElementById('firebaseWarning').style.display = 'block';
+  }
+
+  loadUnitData().then(function(data){
+    currentData = data;
+    renderPublicUnits(data);
+  });
+
+  document.getElementById('loginBtn').addEventListener('click', function(){
+    var pass = document.getElementById('ownerPassword').value;
+    if(pass === OWNER_PASSWORD){
+      document.getElementById('loginBox').style.display = 'none';
+      document.getElementById('adminPanel').style.display = 'block';
+      renderAdmin(currentData || defaultData());
+    } else {
+      document.getElementById('loginError').style.display = 'block';
+    }
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click', function(){
+    document.getElementById('adminPanel').style.display = 'none';
+    document.getElementById('loginBox').style.display = 'flex';
+    document.getElementById('ownerPassword').value = '';
+    document.getElementById('loginError').style.display = 'none';
+  });
+
+  document.getElementById('saveBtn').addEventListener('click', async function(){
+    var data = {};
+    UNITS.forEach(function(u){
+      var row = document.querySelector('tr[data-unit="' + u.id + '"]');
+      if(!row){ data[u.id] = currentData[u.id]; return; }
+      data[u.id] = {
+        status: row.querySelector('.f-status-main').value,
+        tenantName: row.querySelector('.f-name').value.trim(),
+        tenantMobile: row.querySelector('.f-mobile').value.trim(),
+        rent: row.querySelector('.f-rent').value.trim(),
+        paymentStatus: row.querySelector('.f-status').value
+      };
+    });
+    var ok = await saveUnitData(data);
+    currentData = data;
+    renderPublicUnits(data);
+    var note = document.getElementById('saveNote');
+    note.textContent = ok ? '✓ Save हो गया' : '✗ Save नहीं हो पाया, दोबारा कोशिश करें';
+    note.style.display = 'block';
+    setTimeout(function(){ note.style.display = 'none'; }, 2500);
+  });
+
+  document.getElementById('inquiryForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    var name = document.getElementById('name').value.trim();
+    var phone = document.getElementById('phone').value.trim();
+    var prop = document.getElementById('prop').value.trim();
+    var msg = document.getElementById('msg').value.trim();
+
+    var text = 'Namaste, mera naam ' + name + ' hai (mobile: ' + phone + ').';
+    if(prop){ text += ' Mujhe ' + prop + ' mein interest hai.'; }
+    if(msg){ text += ' ' + msg; }
+
+    var url = 'https://wa.me/919755345287?text=' + encodeURIComponent(text);
+    window.open(url, '_blank');
+  });
+</script>
+
+</body>
+</html>
